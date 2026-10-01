@@ -1,0 +1,20 @@
+Part 1
+
+polynomial_zeros.ipynb does not appear in the squashed commit because it was added in one commit and then removed in the following commit. When the two commits are squashed, Git records only the net change relative to their parent commit. Since the notebook does not exist in the final state, it is not included in the squashed commit.
+
+Part 2
+
+I chose Iris's Fraction-based test because the expected values are rational numbers, so they can be compared exactly without using an arbitrary numerical tolerance. This makes the test simple and avoids possible rounding errors from Decimal calculations.
+I also kept Frank's orthogonality test because it checks a different and important property of the Legendre polynomials. I renamed the file to test_orthogonality.py so that pytest can recognize it as a test file and run it automatically.
+
+Part 3
+
+The conflict happened because Carla and Iris both modified the same file, report.md. Even though they were working on different sections, their edits were close enough in the same file that Git could not automatically determine how to combine them.
+If each section were stored in a separate LaTeX file, such as legendre.tex and roots.tex, then Carla and Iris could edit different files independently. The main report.tex file would only use \import commands to include those sections. This would greatly reduce merge conflicts because they would no longer be changing the same file.
+The section order would then be controlled by the order of the \import commands in report.tex. Instead of manually cutting and pasting large sections during a merge conflict, we would only need to adjust a few import lines if the section order needed to change.
+
+Part 4
+
+The tests failed with a TypeError: unsupported operand type(s) for /: 'decimal.Decimal' and 'Fraction'. The error occurred in gauss/gauss.py at line 31, where the quadrature weights are computed.
+Using git blame, I found that this line was written by Frank in commit 74c2bd8, "gauss quadrature + tests to 5-point." His branch was created from commit c4c8852, where legendre_polynomial still returned a list of Decimal values. Iris changed legendre_polynomial to return list[Fraction] in commit 9e5941d, "legendre polynomials to fractions...". That change was merged into main in Part 3.
+Git did not report a merge conflict because Frank and Iris modified different files, gauss.py and bonnet.py. Git mainly detects textual conflicts, so it was able to merge the changes automatically. However, Frank's code depended on the old Decimal return type, and Git cannot detect this kind of semantic dependency. As a result, the merge succeeded, but the program failed at runtime when Decimal and Fraction were used together.
